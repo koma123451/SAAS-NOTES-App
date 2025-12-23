@@ -1,46 +1,70 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import {connectDB} from './config/db.js'
+import express from "express";
+import dotenv from "dotenv";
 import http from "http";
-import { initSocket } from "./realtime/socket.js";
-import authRoutes from './routes/auth.routes.js'
-import noteRoutes from './routes/note.routes.js'
-import cors from 'cors';
+import cors from "cors";
 import cookieParser from "cookie-parser";
-import {globalErrorHandler} from './middleware/globalErrorHandler.js'
+
+import { connectDB } from "./config/db.js";
+import { initSocket } from "./realtime/socket.js";
+import authRoutes from "./routes/auth.routes.js";
+import noteRoutes from "./routes/note.routes.js";
+import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
+
 dotenv.config();
+
 const app = express();
 const server = http.createServer(app);
-const io = initSocket(server)
-app.use(express.json())
+const io = initSocket(server);
+
+/* ---------- middleware ---------- */
+app.use(express.json());
 app.use(cookieParser());
+
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://black-yellow-eta.vercel.app"  // ← Frontend
+  "https://saas-notes-app-gray.vercel.app",   
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("❌ Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
-app.set("io",io)
-app.use("/api/auth",authRoutes)
-app.use("/api/notes",noteRoutes)
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // 允许 Postman / curl / server-side
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// ⭐ 关键：处理预检请求
+app.options("*", cors());
+
+/* ---------- socket ---------- */
+app.set("io", io);
+
+/* ---------- routes ---------- */
+app.use("/api/auth", authRoutes);
+app.use("/api/notes", noteRoutes);
+
 app.get("/api/health", (req, res) => {
   res.send("OK");
 });
 
+/* ---------- error handler ---------- */
 app.use(globalErrorHandler);
-const PORT=process.env.PORT||8080
-//connect DB
-connectDB()
 
-//Listener
-server.listen(PORT,()=>console.log(`Server running on port ${PORT}`))
+/* ---------- start ---------- */
+const PORT = process.env.PORT || 8080;
+
+connectDB();
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
