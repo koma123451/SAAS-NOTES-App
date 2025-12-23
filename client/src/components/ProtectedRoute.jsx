@@ -1,17 +1,19 @@
-import { useUserStore } from "../store/user";
 import { Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useUserStore } from "../store/user";
 
 export default function ProtectedRoute({ children }) {
-  const user = useUserStore((s) => s.user);
-  const fetchUser = useUserStore((s) => s.fetchUser);
-  const loading = useUserStore((s) => s.loading);
+  const { user, initialized } = useUserStore();
 
-  useEffect(() => {
-    if (!user) fetchUser();
-  }, []);
+  // 还没判定完登录态，什么都不做
+  if (!initialized) {
+    return <div>Loading...</div>;
+  }
 
-  if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/login" />;
+  // 已判定，但没登录
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // 已登录，放行
   return children;
 }

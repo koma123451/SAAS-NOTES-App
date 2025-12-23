@@ -1,18 +1,26 @@
 import {create} from 'zustand'
 import {apiRequest} from '../service/api.js'
-export const useUserStore = create((set)=>({
+import {useNoteStore} from './note.js'
+export const useUserStore = create((set,get)=>({
   user:null,
   loading:false,
+  initialized: false,
 
-  fetchUser:async()=>{
+  fetchUser:async(force=false)=>{
+    if (get().initialized&&!force) return;
     try{
       set({loading:true})
-      const res = await apiRequest("/auth/me",{method:"Get"})
+      const res = await apiRequest("/auth/me",{method:"GET"})
+      console.log("dataa",res.data)
+      if(res.ok){
       set({user:res.data})
+      }else{
+        set({user:null})
+      }
     }catch(err){
       set({user:null})
     }finally{
-      set({loading:false})
+      set({loading:false,initialized: true})
     }
   },
 
@@ -20,7 +28,7 @@ export const useUserStore = create((set)=>({
     try{
       set({loading:true})
       await apiRequest("/auth/login",{method:"POST",body:JSON.stringify({email,password})});
-      await useUserStore.getState().fetchUser();
+      await useUserStore.getState().fetchUser(true);
       
     }catch(err){
       console.log("login error:",err)
@@ -30,8 +38,23 @@ export const useUserStore = create((set)=>({
     }
   },
   logout:async()=>{
-    await apiRequest("/auth/logout",{method:"POST"})
-    set({user:null})
+   const logout= await apiRequest("/auth/logout",{method:"POST"})
+   console.log("logout:",logout)
+    set({user:null,initialized: true})
+    useNoteStore.getState().resetNotes()
+  },
+  register:async(username,email,password)=>{
+    const{ok,data}  = await apiRequest("/auth/register",{
+      method:"POST",
+      body:JSON.stringify({username,email,password})
+    })
+    if(ok){
+      set({user:data.user})
+      return{success:true}
+    }
+    return{success:false,message:data?.message||"Registeration failed"}
+   
+
   },
 
 

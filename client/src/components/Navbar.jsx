@@ -1,6 +1,7 @@
 import { Flex, Button, Text, Box, Avatar } from "@chakra-ui/react";
-import { useUserStore } from "../store/user";
+import { Link } from "react-router-dom";
 
+import { useUserStore } from "../store/user";
 export default function Navbar() {
   const user = useUserStore((s) => s.user);
   const logout = useUserStore((s) => s.logout);
@@ -17,10 +18,37 @@ export default function Navbar() {
       boxShadow="sm"
     >
       {/* 左侧 Logo */}
-      <Text fontSize="xl" fontWeight="bold" color="gray.700">
+      <Text fontSize="xl" fontWeight="bold" color="gray.700" as={Link} to="/">
         SaaS Notes
       </Text>
+   {!user && (
+  <Flex gap={3}>
+    <Button
+      as={Link}
+      to="/login"
+      size="sm"
+      bg="gray.700"
+      color="white"
+      _hover={{ bg: "gray.800" }}
+    >
+      Login
+    </Button>
 
+    <Button
+      as={Link}
+      to="/register"
+      size="sm"
+      variant="outline"
+      color="gray.700"
+      borderColor="gray.300"
+      _hover={{ bg: "gray.100" }}
+    >
+      Register
+    </Button>
+  </Flex>
+)}
+
+       
       {/* 右侧用户信息 */}
       {user && (
         <Flex align="center" gap={4}>

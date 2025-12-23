@@ -9,17 +9,37 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useUserStore } from "../store/user";
-
+import { useToast } from '@chakra-ui/react'
+import { useNavigate } from "react-router";
 export default function Register() {
   const register = useUserStore((s) => s.register);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const toast = useToast()
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(username, email, password);
-  };
+    const res=await register(username, email, password);
+    if(!res.success){
+        toast({
+          title: res.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+      })
+      }
+      else{
+      toast({
+          title: 'Account created.',
+          description: "We've created your account for you.",
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+    })
+    navigate("/login")
+  }
+}
 
   return (
     <Flex height="100vh" align="center" justify="center">

@@ -10,4 +10,5 @@ router.get("/",protect,getNotes)
 router.get("/:id",protect,getNotes)
 router.patch("/:id",protect,updateNote)
 
+
 export default router;

@@ -18,7 +18,7 @@ export const registerUser=async (req,res)=>{
   if(exists) return res.status(400).json({message:"Email already exist"});
   const user =await User.create({username,email,password});
   res.cookie("token",gen(user._id),cookieOptions);
-  res.json({id:user._id,username:user.username,email:user.email});
+  res.json(user);
 }
 
 export const loginUser = async (req,res)=>{
@@ -35,11 +35,11 @@ export const loginUser = async (req,res)=>{
 }
 
 export const logoutUser = async(req,res)=>{
-  res.clearCookie("token");
-  res.json({message:"Logged out"})
+  res.clearCookie("token",cookieOptions);
+  res.json({success:true,message:"Logged out"})
 }
 
 export const getMe = async(req,res)=>{
-  const user = await User.findById(req.user.id).select("-password");
+  const user = await User.findById(req.userId).select("-password");
   res.json(user);
 }

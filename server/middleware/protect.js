@@ -11,7 +11,7 @@ export const protect =(req,res,next)=>{
     const decoded=jwt.verify(token,process.env.JWT_SECRET);
     console.log("decoded",decoded)
      req.userId = decoded.id;
-    req.user = { id: decoded.id, role: decoded.role };
+    //req.user = { id: decoded.id, role: decoded.role };
     next()
   }catch(error){
     return res.status(401).json({message:"Invalid token"});

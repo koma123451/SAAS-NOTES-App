@@ -6,18 +6,22 @@ import {
   Input,
   Button,
   Heading,
+  Text
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useUserStore } from "../store/user";
-
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router";
 export default function Login() {
   const login = useUserStore((s) => s.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    const success =await login(email, password);
+    console.log("success",success)
+     navigate("/")
   };
 
   return (
@@ -50,8 +54,21 @@ export default function Login() {
 
           <Button colorScheme="blue" width="full" type="submit">
             Login
-          </Button>
+          </Button>         
+           <Text fontSize="sm" color="gray.500">
+      Don’t have an account?{" "}
+      <Text
+        as={Link}
+        to="/register"
+        color="blue.500"
+        _hover={{ textDecoration: "underline" }}
+        display="inline"
+      >
+        Register
+      </Text>
+    </Text>
         </form>
+        
       </Box>
     </Flex>
   );

@@ -5,6 +5,10 @@ export const useNoteStore = create((set, get) => ({
   notes: [],
   loading: false,
   currentNote: null, // 用于单个 note（查看 / 编辑）
+  pagination:{
+    page:1,
+    totalPages:1
+  },
 
   // -----------------------------
   // CREATE
@@ -32,16 +36,17 @@ export const useNoteStore = create((set, get) => ({
   // -----------------------------
   // GET ALL NOTES
   // -----------------------------
-  getNotes: async () => {
+  getNotes: async (params={}) => {
     try {
       set({ loading: true });
-
-      const { ok, data } = await apiRequest("/notes", {
+      const query = new URLSearchParams(params).toString();
+      const { ok, data } = await apiRequest(`/notes?${query}`, {
         method: "GET",
       });
-
+      console.log("ok",ok)
+      console.log("data",data.data)
       if (ok) {
-        set({ notes: data.notes });
+        set({ notes: data.data ,pagination:data.pagination});
       }
 
     } catch (err) {
@@ -117,4 +122,14 @@ export const useNoteStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+  // store/note.js
+  resetNotes: () => {
+  set({
+    notes: [],
+    pagination: { page: 1, totalPages: 1 },
+    loading: false,
+    currentNote: null,
+  });
+},
+
 }));
