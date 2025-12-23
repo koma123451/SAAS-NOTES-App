@@ -22,29 +22,24 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://saas-notes-app-gray.vercel.app",   
+  "https://https://saas-notes-app-gray.vercel.app/", // ✅ 必须是这个
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // 允许 Postman / curl / server-side
       if (!origin) return callback(null, true);
-
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-
+      console.log("❌ Blocked by CORS:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-// ⭐ 关键：处理预检请求
-app.options("*", cors());
 
 /* ---------- socket ---------- */
 app.set("io", io);
