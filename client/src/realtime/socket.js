@@ -1,10 +1,10 @@
 import { io } from "socket.io-client";
 import {useNoteStore} from '../store/note.js'
-// ⚠️ 一定要和后端 server.listen 的端口一致
-const SOCKET_URL = "http://localhost:8080";
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 // 创建 socket 连接（一加载文件就会执行）
-export const socket = io(SOCKET_URL, {
+export const socket = io(API_URL, {
   withCredentials: true, // 允许携带 cookie（后面鉴权会用）
   transports: ["websocket"], // 强制用 websocket，避免降级干扰理解
 });
