@@ -11,6 +11,7 @@ import noteRoutes from "./routes/note.routes.js";
 import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
 
 dotenv.config();
+console.log("🚀 SERVER VERSION: cors-fix-2025-01-24");
 
 const app = express();
 const server = http.createServer(app);
@@ -22,7 +23,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://saas-notes-app-gray.vercel.app/", 
+  "https://saas-notes-app-gray.vercel.app", 
 ];
 
 app.use(
@@ -31,10 +32,17 @@ app.use(
       console.log("🌐 Incoming origin:", origin);
 
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      if (
+        origin === "http://localhost:5173" ||
+        origin === "https://saas-notes-app-gray.vercel.app" ||
+        /\.vercel\.app$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
 
       console.log("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
+      return callback(null, false); // ❗ 不要 throw Error
     },
     credentials: true,
   })
