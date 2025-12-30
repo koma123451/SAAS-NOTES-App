@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { useNoteStore } from "../store/note.js";
+import { useNoteStore } from "../src/store/note";
 
 const API_URL = import.meta.env.VITE_API_URL;
 // https://xxx.up.railway.app/api

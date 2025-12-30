@@ -11,7 +11,9 @@ export async function apiRequest(path, options = {}) {
   });
 
   const data = await res.json().catch(() => null);
+  console.log("data",data)
   return { ok: res.ok, data };
+
 }
 export const getProductById = (id)=> apiRequest(`/products/${id}`,{
   method:"GET"

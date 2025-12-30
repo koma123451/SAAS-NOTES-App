@@ -8,6 +8,7 @@ import { connectDB } from "./config/db.js";
 import { initSocket } from "./realtime/socket.js";
 import authRoutes from "./routes/auth.routes.js";
 import noteRoutes from "./routes/note.routes.js";
+import adminRoutes from './routes/admin.routes.js'
 import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
 
 dotenv.config();
@@ -55,7 +56,7 @@ app.set("io", io);
 /* ---------- routes ---------- */
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", noteRoutes);
-
+app.use("/api/admin",adminRoutes)
 app.get("/api/health", (req, res) => {
   res.send("OK");
 });

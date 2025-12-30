@@ -46,6 +46,7 @@ export const logoutUser = asyncHandler(async(req,res)=>{
   res.json({success:true,message:"Logged out"})
 })
 
+
 export const getMe = asyncHandler(async(req,res)=>{
   const user = await User.findById(req.userId).select("-password");
   res.json(user);

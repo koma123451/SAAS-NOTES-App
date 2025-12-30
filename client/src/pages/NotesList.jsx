@@ -4,7 +4,7 @@ import { Box, Button, Spinner, VStack, Text,HStack } from "@chakra-ui/react";
 import CreateNoteModal from '../components/CreateNoteModal.jsx';
 import EditNoteModal from "../components/EditNoteModal.jsx";
 import { useToast } from "@chakra-ui/react";   
-import { socket } from "../realtime/socket.js"  
+import { socket } from "../../realtime/socket.js"  
 export default function NotesList() {
   const { notes, loading, getNotes,pagination } = useNoteStore();
   const toast = useToast();
