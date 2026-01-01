@@ -1,6 +1,7 @@
 import { Flex, Box, Button } from "@chakra-ui/react";
-
+import { useNavigate } from "react-router-dom";
 export default function AdminUserRow({ user, onBan }) {
+  const navigate = useNavigate();
   function clickBan() {
     onBan(user._id);
   }
@@ -21,7 +22,13 @@ export default function AdminUserRow({ user, onBan }) {
       </Box>
 
       <Box flex="2" textAlign="right">
-        <Button size="sm" mr={2}>
+         <Button
+      size="sm"
+      mr={2}
+      onClick={() =>
+        navigate(`/admin/users/${user._id}/notes`)
+      }
+    >
           View
         </Button>
 

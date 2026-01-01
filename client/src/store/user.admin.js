@@ -4,13 +4,18 @@ export const useAdminUserStore = create((set, get) => ({
   users: [],
   loading: false,
   initialized: false,
-
-  fetchAllUsers: async () => {
+  pagination:{
+    page:1,
+    total:0,
+    totalPages:1
+  },
+  fetchAllUsers: async (params={}) => {
     try {
       set({ loading: true });
-      const res = await apiRequest("/admin/allusers", { method: "GET" });
+      const query = new URLSearchParams(params).toString();
+      const res = await apiRequest(`/admin/allusers?${query}`, { method: "GET" });
       if (res.ok) {
-        set({ users: res.data.data });
+        set({ users: res.data.data,pagination:res.data.pagination });
       }
     } catch (err) {
       console.log(err);

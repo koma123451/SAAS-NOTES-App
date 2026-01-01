@@ -4,12 +4,44 @@ import AppError from '../utils/AppError.js'
 import mongoose from 'mongoose'
 
 export const getAllUsers=asyncHandler(async(req,res)=>{
-    const users = await User.find()
-    .select("_id username email role createdAt")
-    .sort({createdAt:-1})
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit)||8,10)
+    const skip = (page-1)*limit;
+    const search = req.query.search || "";
+    const sortParam = req.query.sort || "createdAt:desc";
+     // 排序解析
+    const [sortField,sortOrder]=sortParam.split(":")
+    const sort = {
+    [sortField]: sortOrder === "asc" ? 1 : -1,
+    _id:sortOrder === "asc"? 1:-1, //如果createdAt时间几乎一样，这个是兜底
+  };
+    //查询条件
+      const filter = {
+    ...(search && {
+      email: { $regex: search, $options: "i" }, // 模糊搜索
+    }),
+  };
+  const [users, total] = await Promise.all([
+      User.find(filter)
+        
+        .select("_id username email role createdAt isBanned")
+        .sort(sort)
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments(filter),
+    ]);
     // console.log("typeOf" ,typeof users)
      console.log("users",users)
-    res.status(200).json({data:users})
+    res.status(200).json({
+        
+        data:users,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+}
+})
 })
 
 export const getUserById = asyncHandler(async(req,res)=>{
@@ -39,3 +71,4 @@ export const toggleBanUser = asyncHandler(async(req,res)=>{
     isBanned:user.isBanned
   })
 })
+

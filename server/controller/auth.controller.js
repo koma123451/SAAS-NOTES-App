@@ -4,7 +4,16 @@ import bcrypt from 'bcryptjs';
 import asyncHandler from "express-async-handler";
 import AppError from '../utils/AppError.js'
 const isProd = process.env.NODE_ENV === "production";
-const gen=(id)=>jwt.sign({id},process.env.JWT_SECRET,{expiresIn:"7d"});
+const gen = (user) =>
+  jwt.sign(
+    {
+      id: user._id,
+      role: user.role, 
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
 const cookieOptions = {
   httpOnly: true,
   secure: isProd, 
@@ -21,7 +30,7 @@ export const registerUser=asyncHandler(async (req,res)=>{
     throw new AppError("Email already existed",400)
   }
   const user =await User.create({username,email,password});
-  res.cookie("token",gen(user._id),cookieOptions);
+  res.cookie("token",gen(user),cookieOptions);
   res.json(user);
 })
 
@@ -36,7 +45,7 @@ export const loginUser =asyncHandler(async (req,res)=>{
   if(!ok){
     throw new AppError("Invalid ps",400)
   } 
-  res.cookie("token",gen(user._id),cookieOptions);
+  res.cookie("token",gen(user),cookieOptions);
  // res.json({id:user._id,username:user.username,email:user.email})
   res.json({ success: true });
 }

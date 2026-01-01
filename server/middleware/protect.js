@@ -20,6 +20,7 @@ export const protect =async (req,res,next)=>{
     }
      req.userId = decoded.id;
      req.role=decoded.role;
+     console.log("protect req.role",req.role)
     //req.user = { id: decoded.id, role: decoded.role };
     next()
   }catch(error){

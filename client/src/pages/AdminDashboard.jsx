@@ -6,25 +6,34 @@ import {
   Input,
   Button,
   Heading,
-  Text
+  Text,
+  useToast
 } from "@chakra-ui/react";
-import {useEffect} from "react";
+
+import {useEffect,useState} from "react";
 import {useAdminUserStore} from '../store/user.admin.js'
 import {useAdminNoteStore} from '../store/note.admin.js'
 import AdminUserList from '../components/AdminUserlist.jsx'
 export default function AdminDashboard(){
 // 1️⃣ 统一用 selector，一次性订阅
-const users = useAdminUserStore((s) => s.users);
+const totalUsers = useAdminUserStore((s) => s.pagination.total);
+const users = useAdminUserStore((s)=>s.users)
 const loadingUsers = useAdminUserStore((s) => s.loading);
 const fetchAllUsers = useAdminUserStore((s) => s.fetchAllUsers);
 const banUser = useAdminUserStore((s) => s.banUser);
 const notes = useAdminNoteStore((s) => s.notes);
-const fetchAllNotes = useAdminNoteStore((s) => s.getAllNotes);
-
+const getAllNotes = useAdminNoteStore((s) => s.getAllNotes);
+const pagination = useAdminUserStore((s) => s.pagination);
+const toast = useToast()
+const [page,setPage]=useState(1)
 useEffect(() => {
-  fetchAllUsers();
-  fetchAllNotes();
-}, [fetchAllUsers, fetchAllNotes]);
+  fetchAllUsers({
+      page,
+      limit:8,
+      sort: "createdAt:desc"
+    });
+  getAllNotes();
+}, [fetchAllUsers, getAllNotes,page]);
 
 // useEffect(() => {
 //   console.log("users updated:", users);
@@ -35,12 +44,15 @@ useEffect(() => {
 // }, [notes]);
 function reFresh(){
   fetchAllUsers()
-  fetchAllNotes()
+  getAllNotes()
+  toast({
+     title: 'Data updated',
+     description: "Data updated",
+     status: 'success',
+     duration: 3000,
+     isClosable: true,
+  })
 }
-
-
-
-
 return (
   <Flex minH="100vh" bg="gray.900" color="gray.100">
     {/* Sidebar */}
@@ -98,7 +110,7 @@ return (
           <Text fontSize="sm" color="gray.400">
             Total Users
           </Text>
-          <Heading size="lg">{users.length}</Heading>
+          <Heading size="lg">{totalUsers}</Heading>
         </Box>
 
         <Box
@@ -183,11 +195,24 @@ return (
         {/* Pagination */}
         <Flex justify="space-between" mt={6}>
           <Text fontSize="sm" color="gray.400">
-            Page 1 of 5
+            {`page ${pagination.page} of ${pagination.totalPages}`}
           </Text>
           <Flex gap={2}>
-            <Button size="sm">Prev</Button>
-            <Button size="sm">Next</Button>
+            <Button
+              size="sm"
+              isDisabled={pagination.page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Prev
+            </Button>
+
+            <Button
+              size="sm"
+              isDisabled={pagination.page >= pagination.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
           </Flex>
         </Flex>
       </Box>
