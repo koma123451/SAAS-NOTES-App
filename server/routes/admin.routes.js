@@ -6,13 +6,13 @@ import {protect} from '../middleware/protect.js'
 const router = express.Router();
 //Admin
 //users
-router.get("/allusers",protect,admin,getAllUsers)
+router.get("/users",protect,admin,getAllUsers)
 // router.get("/allusers",getAllUsers)
 //route
-router.get("/allnotes",protect,admin,getAllNotes)
+router.get("/notes",protect,admin,getAllNotes)
 // router.get("/allnotes",getAllNotes)
 
-router.post("delete/:id",protect,admin,deleteAnyNote)
+router.post("/delete/:id",protect,admin,deleteAnyNote)
 
 router.patch("/users/:id/ban",protect,admin,toggleBanUser)
 

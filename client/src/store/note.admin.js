@@ -12,7 +12,7 @@ export const useAdminNoteStore=create((set,get)=>({
     console.log("Request hit getAllNotes")
     try{
       set({loading:true})
-      const{ok,data} = await apiRequest("/admin/allnotes",{method:"GET"})
+      const{ok,data} = await apiRequest("/admin/notes",{method:"GET"})
       console.log("ok",ok)
       if(ok){
         set({notes:data.data})

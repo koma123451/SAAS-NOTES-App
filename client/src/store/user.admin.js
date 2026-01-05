@@ -13,7 +13,7 @@ export const useAdminUserStore = create((set, get) => ({
     try {
       set({ loading: true });
       const query = new URLSearchParams(params).toString();
-      const res = await apiRequest(`/admin/allusers?${query}`, { method: "GET" });
+      const res = await apiRequest(`/admin/users?${query}`, { method: "GET" });
       if (res.ok) {
         set({ users: res.data.data,pagination:res.data.pagination });
       }
