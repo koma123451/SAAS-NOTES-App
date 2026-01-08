@@ -15,10 +15,10 @@ export default function NotesList() {
   useEffect(() => {
     getNotes({
       page,
-      limit:3,
+      limit: 3,
       sort: "createdAt:desc"
     });
-  }, [page]);
+  }, [page, getNotes]);
   useEffect(()=>{
     const handler = ()=>{
       toast({

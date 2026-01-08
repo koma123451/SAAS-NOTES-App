@@ -12,7 +12,15 @@ import adminRoutes from './routes/admin.routes.js'
 import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
 
 dotenv.config();
-console.log("🚀 SERVER VERSION: cors-fix-2025-01-24");
+
+// Validate required environment variables
+const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`❌ Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -30,20 +38,20 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      console.log("🌐 Incoming origin:", origin);
-
       if (!origin) return callback(null, true);
 
-      if (
-        origin === "http://localhost:5173" ||
-        origin === "https://saas-notes-app-gray.vercel.app" ||
-        /\.vercel\.app$/.test(origin)
-      ) {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "https://saas-notes-app-gray.vercel.app"
+      ];
+      
+      const isAllowed = allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin);
+      
+      if (isAllowed) {
         return callback(null, true);
       }
 
-      console.log("❌ Blocked by CORS:", origin);
-      return callback(null, false); // ❗ 不要 throw Error
+      return callback(null, false);
     },
     credentials: true,
   })

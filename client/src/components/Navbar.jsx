@@ -17,7 +17,7 @@ export default function Navbar() {
       borderBottom="1px solid #E2E8F0"
       boxShadow="sm"
     >
-      {/* 左侧 Logo */}
+      {/* Left side Logo */}
       <Text fontSize="xl" fontWeight="bold" color="gray.700" as={Link} to="/">
         SaaS Notes
       </Text>
@@ -49,7 +49,7 @@ export default function Navbar() {
 )}
 
        
-      {/* 右侧用户信息 */}
+      {/* Right side user info */}
       {user && (
         <Flex align="center" gap={4}>
           <Flex align="center" gap={2}>

@@ -1,20 +1,29 @@
 const API_URL = import.meta.env.VITE_API_URL;
-console.log("current api_url",API_URL)
+
 export async function apiRequest(path, options = {}) {
-  const res = await fetch(`${API_URL}${path}`, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options,
-  });
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      },
+      ...options,
+    });
 
-  const data = await res.json().catch(() => null);
-  console.log("data",data)
-  return { ok: res.ok, data };
-
+    const data = await res.json().catch(() => ({ message: "Invalid JSON response" }));
+    
+    return { 
+      ok: res.ok, 
+      data,
+      status: res.status
+    };
+  } catch (error) {
+    console.error("API request error:", error);
+    return {
+      ok: false,
+      data: { message: error.message || "Network error" },
+      status: 0
+    };
+  }
 }
-export const getProductById = (id)=> apiRequest(`/products/${id}`,{
-  method:"GET"
-});

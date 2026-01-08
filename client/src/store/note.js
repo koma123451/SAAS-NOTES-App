@@ -4,7 +4,7 @@ import { apiRequest } from "../service/api";
 export const useNoteStore = create((set, get) => ({
   notes: [],
   loading: false,
-  currentNote: null, // 用于单个 note（查看 / 编辑）
+  currentNote: null, // For single note (view / edit)
   pagination:{
     page:1,
     totalPages:1
@@ -23,11 +23,11 @@ export const useNoteStore = create((set, get) => ({
       });
 
       if (ok) {
-        await get().getNotes(); // 自动刷新列表
+        await get().getNotes(); // Auto refresh list
       }
 
     } catch (err) {
-      console.log("Create note error:", err);
+      console.error("Create note error:", err);
     } finally {
       set({ loading: false });
     }
@@ -43,14 +43,12 @@ export const useNoteStore = create((set, get) => ({
       const { ok, data } = await apiRequest(`/notes?${query}`, {
         method: "GET",
       });
-      console.log("ok",ok)
-      console.log("data",data.data)
       if (ok) {
         set({ notes: data.data ,pagination:data.pagination});
       }
 
     } catch (err) {
-      console.log("Get notes error:", err);
+      console.error("Get notes error:", err);
     } finally {
       set({ loading: false });
     }
@@ -68,11 +66,11 @@ export const useNoteStore = create((set, get) => ({
       });
 
       if (ok) {
-        set({ currentNote: data.note }); // 存一条
+        set({ currentNote: data.note }); // Store single note
       }
 
     } catch (err) {
-      console.log("Get note by ID error:", err);
+      console.error("Get note by ID error:", err);
     } finally {
       set({ loading: false });
     }
@@ -95,7 +93,7 @@ export const useNoteStore = create((set, get) => ({
       }
 
     } catch (err) {
-      console.log("Update note error:", err);
+      console.error("Update note error:", err);
     } finally {
       set({ loading: false });
     }
@@ -117,7 +115,7 @@ export const useNoteStore = create((set, get) => ({
       }
 
     } catch (err) {
-      console.log("Delete note error:", err);
+      console.error("Delete note error:", err);
     } finally {
       set({ loading: false });
     }

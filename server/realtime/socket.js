@@ -7,7 +7,7 @@ export function initSocket(server) {
     cors: {
       origin: [
         "http://localhost:5173",
-        "https://saas-notes-app-gray.vercel.app/", // ✅ 和 server.js 完全一致
+        "https://saas-notes-app-gray.vercel.app/", // Must match server.js exactly
       ],
       credentials: true,
     },

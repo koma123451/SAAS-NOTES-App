@@ -15,7 +15,7 @@ import {useAdminUserStore} from '../store/user.admin.js'
 import {useAdminNoteStore} from '../store/note.admin.js'
 import AdminUserList from '../components/AdminUserlist.jsx'
 export default function AdminDashboard(){
-// 1️⃣ 统一用 selector，一次性订阅
+// Use selectors to subscribe once
 const totalUsers = useAdminUserStore((s) => s.pagination.total);
 const users = useAdminUserStore((s)=>s.users)
 const loadingUsers = useAdminUserStore((s) => s.loading);
@@ -28,12 +28,12 @@ const toast = useToast()
 const [page,setPage]=useState(1)
 useEffect(() => {
   fetchAllUsers({
-      page,
-      limit:8,
-      sort: "createdAt:desc"
-    });
-  getAllNotes();
-}, [fetchAllUsers, getAllNotes,page]);
+    page,
+    limit: 8,
+    sort: "createdAt:desc"
+  });
+  getAllNotes({ page: 1, limit: 10 });
+}, [fetchAllUsers, getAllNotes, page]);
 
 // useEffect(() => {
 //   console.log("users updated:", users);

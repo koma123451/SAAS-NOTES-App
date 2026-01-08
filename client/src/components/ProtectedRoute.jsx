@@ -4,12 +4,12 @@ import { useUserStore } from "../store/user";
 export default function ProtectedRoute({ children }) {
   const { user, initialized } = useUserStore();
 
-  // 还没判定完登录态，什么都不做
+  // Authentication status not yet determined, show loading
   if (!initialized) {
     return <div>Loading...</div>;
   }
 
-  // 已判定，但没登录
+  // Not authenticated, redirect to login
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -17,6 +17,6 @@ export default function ProtectedRoute({ children }) {
   if(user.role==="admin"){
     return <Navigate to="/admin" replace />;
   }
-  // 已登录，放行
+  // Authenticated, allow access
   return children;
 }

@@ -4,18 +4,68 @@ import AppError from '../utils/AppError.js'
 import mongoose from "mongoose";
 
 export const getAllNotes = asyncHandler(async(req,res)=>{
-  const notes = await Note.find();
-  // console.log("notes",notes)
-  res.status(200).json({data:notes})
+  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+  const skip = (page - 1) * limit;
+
+  const search = req.query.search || "";
+  const sortParam = req.query.sort || "createdAt:desc";
+
+  // Parse sort parameters
+  const [sortField, sortOrder] = sortParam.split(":");
+  const sort = {
+    [sortField]: sortOrder === "asc" ? 1 : -1,
+    _id: sortOrder === "asc" ? 1 : -1,
+  };
+
+  // Query filter
+  const filter = {};
+  if(search) {
+    filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { content: { $regex: search, $options: "i" } }
+    ];
+  }
+
+  const [notes, total] = await Promise.all([
+    Note.find(filter)
+      .populate("userId", "username email")
+      .sort(sort)
+      .skip(skip)
+      .limit(limit),
+    Note.countDocuments(filter),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: notes,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  });
 })
 
 export const deleteAnyNote = asyncHandler(async(req,res)=>{
   const {id} = req.params;
-  if(!mongoose.Types.ObjectId.isValid(id)) throw new AppError("bad request",400)
-  const note=await Note.findById(id);
-  if(!note) throw new AppError("note not found",404)
-  await Note.findOneAndDelete(note);
-  res.status(200).json({success:true})
+  
+  if(!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError("Invalid note ID", 400);
+  }
+  
+  const note = await Note.findById(id);
+  if(!note) {
+    throw new AppError("Note not found", 404);
+  }
+  
+  await Note.findByIdAndDelete(id);
+  
+  res.status(200).json({
+    success: true,
+    message: "Note deleted successfully"
+  });
 })
 
 export const getUserNotes = asyncHandler(async (req, res) => {
@@ -27,20 +77,20 @@ export const getUserNotes = asyncHandler(async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit)||5,8)
   const skip = (page-1)*limit;
   const sortParam = req.query.sort || "createdAt:desc";
-   // 排序解析
+   // Parse sort parameters
    const [sortField,sortOrder]=sortParam.split(":");
    const sort={
     [sortField]:sortOrder==="asc"?1:-1,
-    _id:sortOrder === "asc"?1:-1, //如果createdAt时间几乎一样，这个是兜底
+    _id:sortOrder === "asc"?1:-1, // Fallback when createdAt timestamps are nearly identical
    }
-   //查询条件
+   // Query filter
     const [notes, total] = await Promise.all([
     Note.find({ userId })
       .select("title content createdAt")
       .sort(sort)
       .skip(skip)
       .limit(limit),
-      Note.countDocuments({ userId })
+   Note.countDocuments({ userId })
   ]);
   res.status(200).json({
     success:true,

@@ -18,7 +18,7 @@ export const useAdminUserStore = create((set, get) => ({
         set({ users: res.data.data,pagination:res.data.pagination });
       }
     } catch (err) {
-      console.log(err);
+      console.error("Fetch users error:", err);
     } finally {
       set({ loading: false, initialized: true });
     }
@@ -40,7 +40,7 @@ export const useAdminUserStore = create((set, get) => ({
         ),
       }));
     } catch (err) {
-      console.log(err);
+      console.error("Ban user error:", err);
     }
   },
 }));

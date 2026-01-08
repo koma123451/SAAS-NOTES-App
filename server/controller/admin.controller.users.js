@@ -9,29 +9,26 @@ export const getAllUsers=asyncHandler(async(req,res)=>{
     const skip = (page-1)*limit;
     const search = req.query.search || "";
     const sortParam = req.query.sort || "createdAt:desc";
-     // 排序解析
+     // Parse sort parameters
     const [sortField,sortOrder]=sortParam.split(":")
     const sort = {
     [sortField]: sortOrder === "asc" ? 1 : -1,
-    _id:sortOrder === "asc"? 1:-1, //如果createdAt时间几乎一样，这个是兜底
+    _id:sortOrder === "asc"? 1:-1, // Fallback when createdAt timestamps are nearly identical
   };
-    //查询条件
+    // Query filter
       const filter = {
     ...(search && {
-      email: { $regex: search, $options: "i" }, // 模糊搜索
+      email: { $regex: search, $options: "i" }, // Case-insensitive search
     }),
   };
   const [users, total] = await Promise.all([
       User.find(filter)
-        
         .select("_id username email role createdAt isBanned")
         .sort(sort)
         .skip(skip)
         .limit(limit),
       User.countDocuments(filter),
     ]);
-    // console.log("typeOf" ,typeof users)
-     console.log("users",users)
     res.status(200).json({
         
         data:users,
@@ -58,17 +55,33 @@ export const getUserById = asyncHandler(async(req,res)=>{
 
 export const toggleBanUser = asyncHandler(async(req,res)=>{
   const{id}=req.params;
-  if(req.userId===id)throw new AppError("You cannot ban yourself",400)
+  
+  // Input validation
+  if(!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new AppError("Invalid user ID", 400);
+  }
+  
+  if(req.user.id.toString() === id) {
+    throw new AppError("You cannot ban yourself", 400);
+  }
+  
   const user = await User.findById(id);
-  if(!user) throw new AppError ("User not found",404)
-    
-      //return if user already banned
-  user.isBanned=!user.isBanned;
-  await user.save()
+  if(!user) {
+    throw new AppError("User not found", 404);
+  }
+  
+  // Prevent banning other admins
+  if(user.role === "admin" && req.user.id.toString() !== id) {
+    throw new AppError("Cannot ban another admin", 403);
+  }
+  
+  user.isBanned = !user.isBanned;
+  await user.save();
+  
   res.status(200).json({
-    success:true,
-    message:"User banned successfully",
-    isBanned:user.isBanned
-  })
+    success: true,
+    message: user.isBanned ? "User banned successfully" : "User unbanned successfully",
+    isBanned: user.isBanned
+  });
 })
 

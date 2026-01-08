@@ -8,18 +8,19 @@ export const useAdminNoteStore=create((set,get)=>({
     page:1,
     totalPages:1
   },
-  getAllNotes:async()=>{
-    console.log("Request hit getAllNotes")
+  getAllNotes:async(params={})=>{
     try{
       set({loading:true})
-      const{ok,data} = await apiRequest("/admin/notes",{method:"GET"})
-      console.log("ok",ok)
+      const query = new URLSearchParams(params).toString();
+      const{ok,data} = await apiRequest(`/admin/notes?${query}`,{method:"GET"})
       if(ok){
-        set({notes:data.data})
+        set({
+          notes: data.data || [],
+          pagination: data.pagination || { page: 1, totalPages: 1 }
+        })
       }
-
     }catch(err){
-      console.log("err",err)
+      console.error("Get all notes error:", err)
     }finally{
       set({loading:false})
     }
@@ -36,7 +37,7 @@ export const useAdminNoteStore=create((set,get)=>({
         
       }
     }catch(err){
-      console.log("err: ",err)
+      console.error("Get user notes error:", err)
     }finally{
       set({loading:false})
     }

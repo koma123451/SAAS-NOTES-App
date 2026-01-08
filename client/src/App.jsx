@@ -22,7 +22,7 @@ function App() {
       <Navbar />
 
       <Routes>
-        {/* 普通用户 */}
+        {/* Regular user routes */}
         <Route
           path="/"
           element={
@@ -32,7 +32,7 @@ function App() {
           }
         />
 
-        {/* admin 路由组 */}
+        {/* Admin route group */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route

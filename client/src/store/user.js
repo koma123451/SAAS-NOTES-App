@@ -11,9 +11,11 @@ export const useUserStore = create((set,get)=>({
     try{
       set({loading:true})
       const res = await apiRequest("/auth/me",{method:"GET"})
-      console.log("dataa",res.data)
       if(res.ok){
-      set({user:res.data})
+        // Backend returns { success: true, data: user }
+        // Handle both formats: { data: user } or { data: { user: ... } }
+        const userData = res.data?.data || res.data;
+        set({user:userData})
       }else{
         set({user:null})
       }
@@ -31,15 +33,14 @@ export const useUserStore = create((set,get)=>({
       await useUserStore.getState().fetchUser(true);
       
     }catch(err){
-      console.log("login error:",err)
+      console.error("Login error:", err)
     }
     finally{
       set({loading:false})
     }
   },
   logout:async()=>{
-   const logout= await apiRequest("/auth/logout",{method:"POST"})
-   console.log("logout:",logout)
+   await apiRequest("/auth/logout",{method:"POST"})
     set({user:null,initialized: true})
     useNoteStore.getState().resetNotes()
   },
