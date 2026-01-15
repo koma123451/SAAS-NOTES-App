@@ -2,54 +2,41 @@ import {Note} from '../model/note.model.js';
 import asyncHandler from "express-async-handler";
 import AppError from '../utils/AppError.js'
 import mongoose from "mongoose";
+import {getAllNotesService} from '../services/admin.notes.service.js'
 
 export const getAllNotes = asyncHandler(async(req,res)=>{
-  const page = Math.max(parseInt(req.query.page) || 1, 1);
-  const limit = Math.min(parseInt(req.query.limit) || 10, 50);
-  const skip = (page - 1) * limit;
-
-  const search = req.query.search || "";
-  const sortParam = req.query.sort || "createdAt:desc";
-
-  // Parse sort parameters
-  const [sortField, sortOrder] = sortParam.split(":");
-  const sort = {
-    [sortField]: sortOrder === "asc" ? 1 : -1,
-    _id: sortOrder === "asc" ? 1 : -1,
+ const {
+    page,
+    limit,
+    search,
+    sort,
+  } = req.query as {
+    page?: string;
+    limit?: string;
+    search?: string;
+    sort?: string;
   };
 
-  // Query filter
-  const filter = {};
-  if(search) {
-    filter.$or = [
-      { title: { $regex: search, $options: "i" } },
-      { content: { $regex: search, $options: "i" } }
-    ];
-  }
-
-  const [notes, total] = await Promise.all([
-    Note.find(filter)
-      .populate("userId", "username email")
-      .sort(sort)
-      .skip(skip)
-      .limit(limit),
-    Note.countDocuments(filter),
-  ]);
-
+  const result = await getAllNotesService({  
+      user:{
+        userId: req.user.id,
+        userRole: req.user.role,
+      },
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      search,
+      sort,
+    
+  })
   res.status(200).json({
     success: true,
-    data: notes,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
+    data: result.notes,
+    pagination: result.pagination,
   });
 })
 
 export const deleteAnyNote = asyncHandler(async(req,res)=>{
-  const {id} = req.params;
+  const {id} = req.params as {id:string};
   
   if(!mongoose.Types.ObjectId.isValid(id)) {
     throw new AppError("Invalid note ID", 400);
@@ -69,14 +56,14 @@ export const deleteAnyNote = asyncHandler(async(req,res)=>{
 })
 
 export const getUserNotes = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.params as {userId:string};
    if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new AppError("Invalid user id", 400);
   }
-  const page = Math.max(parseInt(req.query.page) || 1, 1);
-  const limit = Math.min(parseInt(req.query.limit)||5,8)
+  const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+  const limit = Math.min(parseInt(req.query.limit as string)||5,8)
   const skip = (page-1)*limit;
-  const sortParam = req.query.sort || "createdAt:desc";
+  const sortParam = req.query.sort as string || "createdAt:desc";
    // Parse sort parameters
    const [sortField,sortOrder]=sortParam.split(":");
    const sort={
@@ -87,7 +74,7 @@ export const getUserNotes = asyncHandler(async (req, res) => {
     const [notes, total] = await Promise.all([
     Note.find({ userId })
       .select("title content createdAt")
-      .sort(sort)
+      .sort(sort as any)
       .skip(skip)
       .limit(limit),
    Note.countDocuments({ userId })

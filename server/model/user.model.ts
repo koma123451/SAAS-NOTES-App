@@ -1,7 +1,19 @@
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema({
+import bcrypt from "bcryptjs";
+import mongoose ,{ Schema, Document } from "mongoose";
+
+export interface IUser extends Document {
+  username: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
+  isBanned: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+const userSchema = new Schema <IUser>({
   username: { 
     type: String, 
     required: [true, "Username is required"],

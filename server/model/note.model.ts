@@ -1,6 +1,17 @@
-import mongoose from "mongoose";
+import mongoose ,{ Schema, Document } from "mongoose";
 
-const noteSchema = new mongoose.Schema(
+
+export interface INote extends Document {
+  title: string;
+  content: string;
+  userId: mongoose.Types.ObjectId;
+  isDeleted?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+const noteSchema = new Schema<INote>(
   {
     title: { 
       type: String, 
@@ -18,7 +29,11 @@ const noteSchema = new mongoose.Schema(
       ref: "User", 
       required: [true, "User ID is required"],
       index: true
-    }
+    },
+    isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   },
   { timestamps: true }
 );

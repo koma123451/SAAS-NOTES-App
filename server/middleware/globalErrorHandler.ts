@@ -1,14 +1,22 @@
+import express from "express";
+import AppError from "../utils/AppError.js";
 // middleware/globalErrorHandler.js
-export const globalErrorHandler = (err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal server error";
+export const globalErrorHandler = (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  let statusCode = 500;
+  let message = "Internal server error";
+  
+  if (err instanceof AppError) {
+    statusCode = err.statusCode;
+    message = err.message;
+  }
+  
 
   // Return detailed error info in development
   const isDevelopment = process.env.NODE_ENV !== "production";
   
   // MongoDB validation error
   if(err.name === "ValidationError") {
-    const messages = Object.values(err.errors).map(e => e.message);
+    const messages = Object.values(err.errors).map((e: any) => e.message);
     return res.status(400).json({
       success: false,
       message: "Validation error",

@@ -1,13 +1,14 @@
-import { Server } from "socket.io";
+import { Server as IOServer } from "socket.io";
+import type { Server as HTTPServer } from "http";
 
-export function initSocket(server) {
+export function initSocket(server: HTTPServer) {
   console.log("🟡 initSocket called");
 
-  const io = new Server(server, {
+  const io = new IOServer(server, {
     cors: {
       origin: [
         "http://localhost:5173",
-        "https://saas-notes-app-gray.vercel.app/", // Must match server.js exactly
+        "https://saas-notes-app-gray.vercel.app",
       ],
       credentials: true,
     },

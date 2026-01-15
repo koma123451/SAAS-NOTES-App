@@ -10,6 +10,13 @@ import authRoutes from "./routes/auth.routes.js";
 import noteRoutes from "./routes/note.routes.js";
 import adminRoutes from './routes/admin.routes.js'
 import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
+process.on("uncaughtException", (err) => {
+  console.error("🔥 uncaughtException:", err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("🔥 unhandledRejection:", reason);
+});
 
 dotenv.config();
 
@@ -75,8 +82,18 @@ app.use(globalErrorHandler);
 /* ---------- start ---------- */
 const PORT = process.env.PORT || 8080;
 
-connectDB();
+async function startServer() {
+  try {
+    await connectDB();
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+    process.exit(1);
+  }
+}
+
+startServer();
+

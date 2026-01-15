@@ -2,6 +2,7 @@ import express from 'express';
 import {registerUser,loginUser,logoutUser,getMe} from '../controller/auth.controller.js'
 import {protect} from '../middleware/protect.js'
 import {admin} from '../middleware/admin.js'
+console.log('✅ auth.routes loaded')
 
 const router = express.Router();
 //User

@@ -141,6 +141,25 @@ Role Check → Input Validation → Controller → Database
 
 ---
 
+### Service & Real-Time Event Boundaries
+
+The backend follows a strict separation of concerns between controllers and services:
+
+- **Controllers** handle HTTP-specific concerns such as request parsing, response formatting, and real-time event emission (Socket.io).
+- **Services** contain pure business logic, database operations, authorization rules, and audit logging.
+- **Services are framework-agnostic** and do not depend on Express, Socket.io, or HTTP concepts.
+
+
+**Example flow:**
+
+1. Controller receives HTTP request
+2. Controller calls service with typed business input
+3. Service performs validation, authorization, and database operations
+4. Controller emits real-time Socket.io events if needed
+5. Controller returns HTTP response
+
+This design improves testability, maintainability, and allows services to be reused in different execution contexts (HTTP, background jobs, CLI, etc.).
+
 ## 🔐 Security
 
 ### Authentication Security
@@ -504,9 +523,8 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Bowen Dai**
 
-- Portfolio: [Your Portfolio URL]
-- LinkedIn: [Your LinkedIn URL]
-- Email: [Your Email]
+- LinkedIn: [https://www.linkedin.com/in/bowendai300775723/]
+- Email: [daibowen6111@gmail.com]
 
 ---
 

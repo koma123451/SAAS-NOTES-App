@@ -4,11 +4,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "tsx watch server.ts"
   },
-   "engines": {
+  "engines": {
     "node": "20.x"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -25,6 +26,15 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^25.0.5",
+    "nodemon": "^3.1.11",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

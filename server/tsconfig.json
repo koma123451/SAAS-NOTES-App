@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2022",   //TypeScript 编译出来的 JS，用 Node 18+ 能直接跑的语法。
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",     //“按 Node 现在真实运行方式来理解 import/export”。
+
+    "rootDir": ".",  //TypeScript 源码的根目录。
+    "outDir": "dist",  //TypeScript 编译输出的目录。
+
+    "strict": true,  //开启所有严格模式检查。  不允许 undefined 装死 ,不允许类型乱来 ,不允许“我猜它有”
+    "esModuleInterop": true,  //允许以 CommonJS 模块风格导入 ES 模块。
+    "forceConsistentCasingInFileNames": true,  //强制文件名大小写一致。
+    "skipLibCheck": true,  //跳过库文件检查。
+
+    "resolveJsonModule": true,  //允许导入 JSON 文件。
+    "types": ["node"]  //这是一个 Node 项目，不是前端项目
+  },
+  "include": ["**/*.ts", "../express.d.ts"],  //只检查 src 里的 TS
+  "exclude": ["node_modules", "dist"]  //排除的文件。
+}
