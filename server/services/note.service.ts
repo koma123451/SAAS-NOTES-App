@@ -1,5 +1,5 @@
 import {Note,INote} from '../model/note.model.js'
-import {AuditLog} from '../model/auditLog.model.js'
+import {createAuditLog} from './audit-log.service.js'
 import mongoose from 'mongoose'
 import AppError from '../utils/AppError.js'
 import type { SortOrder } from "mongoose";
@@ -29,6 +29,8 @@ export async function updateNoteService({
   if(note.userId.toString() !==userId.toString() && userRole!== "admin") {
     throw new AppError("Not authorized to update this note", 403);
   }
+  //a copy of old data for audit log
+  const before=note.toObject()
 
   if(title && title.trim() !== note.title) {
     const exist = await Note.findOne({
@@ -44,15 +46,23 @@ export async function updateNoteService({
   if (title !== undefined) note.title = title.trim()
   if (content !== undefined) note.content = content.trim()
   await note.save()
+  const after=note.toObject()
 
-  // ⭐ 业务成功之后，写 audit log
-  await AuditLog.create({
-    actorId: userId,
-    actorRole: userRole,
-    action: 'UPDATE_NOTE',
-    targetType: 'note',
-    targetId: note._id,
+      try {
+       //  audit log
+      await createAuditLog({
+      actorId: userId,
+        actorRole: userRole,
+        action: 'UPDATE_NOTE',
+        targetType: 'note',
+        targetId: note._id.toString(),
+        metadata: { before,after }
   })
+    } catch (err) {
+      console.error("audit failed", err);
+    }
+
+
 
   return note
 }
@@ -70,16 +80,25 @@ export async function deleteNoteService({
    if(note.userId.toString() !== userId.toString() && userRole !== "admin") {
      throw new AppError("Not authorized to delete this note", 403);
    }
-   await Note.findByIdAndDelete(noteId);
+   const before=note.toObject()
 
-    await AuditLog.create({
-    actorId: userId,
-    actorRole: userRole,
-    action: 'DELETE_NOTE',
-    targetType: 'note',
-    targetId: note._id,
-  })
-
+  // Soft delete
+  note.isDeleted = true;
+  note.deletedAt = new Date();
+  await note.save();
+   try {
+    //audit log
+      await createAuditLog({
+        actorId: userId,
+        actorRole: userRole,
+        action: 'DELETE_NOTE',
+        targetType: 'note',
+        targetId: note._id.toString(),
+        metadata: { before, after: { isDeleted: true, deletedAt: note.deletedAt } }
+      })
+      } catch (err) {
+        console.error("audit failed", err);
+      }
    return
 }
 export async function createNoteService({
@@ -108,15 +127,21 @@ export async function createNoteService({
     content: content.trim(),
     userId: userId
   });
-  
-    // ⭐ 业务成功之后，写 audit log
-  await AuditLog.create({
+    try {
+   // audit log
+    await createAuditLog({
     actorId: userId,
     actorRole: userRole,
     action: 'CREATE_NOTE',
     targetType: 'note',
-    targetId: note._id,
+    targetId: note._id.toString(),
   })
+    } catch (err) {
+      console.error("audit failed", err);
+    }
+
+  
+ 
       return note
   }
   

@@ -9,6 +9,7 @@ import {
   Text,
   useToast
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 import {useEffect,useState} from "react";
 import {useAdminUserStore} from '../store/user.admin.js'
@@ -67,20 +68,44 @@ return (
         Admin Panel
       </Heading>
 
-      <Flex direction="column" gap={3}>
-        <Button variant="ghost" justifyContent="flex-start">
-          Dashboard
-        </Button>
-        <Button variant="ghost" justifyContent="flex-start">
-          Users
-        </Button>
-        <Button variant="ghost" justifyContent="flex-start">
-          Notes
-        </Button>
-        <Button variant="ghost" justifyContent="flex-start">
-          Audit Logs
-        </Button>
-      </Flex>
+    <Flex direction="column" gap={3}>
+  <Button
+    as={Link}
+    to="/admin"
+    variant="ghost"
+    justifyContent="flex-start"
+  >
+    Dashboard
+  </Button>
+
+  <Button
+    as={Link}
+    to="/admin/users"
+    variant="ghost"
+    justifyContent="flex-start"
+  >
+    Users
+  </Button>
+
+  <Button
+    as={Link}
+    to="/admin/notes"
+    variant="ghost"
+    justifyContent="flex-start"
+  >
+    Notes
+  </Button>
+
+  <Button
+    as={Link}
+    to="/admin/auditlog"
+    variant="ghost"
+    justifyContent="flex-start"
+  >
+    Audit Logs
+  </Button>
+</Flex>
+
     </Box>
 
     {/* Main Content */}

@@ -5,9 +5,10 @@ export interface INote extends Document {
   title: string;
   content: string;
   userId: mongoose.Types.ObjectId;
-  isDeleted?: boolean;
+  isDeleted:boolean,
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
 }
 
 
@@ -34,8 +35,13 @@ const noteSchema = new Schema<INote>(
     type: Boolean,
     default: false,
   },
+    deletedAt: {
+    type: Date, 
+    default: null,    
   },
+},
   { timestamps: true }
+
 );
 
 // Index optimization - improve query performance

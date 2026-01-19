@@ -4,6 +4,8 @@ import {User,IUser} from '../model/user.model.js';
 import type { SortOrder } from "mongoose";
 import { UserSummary } from "../types/common.types.js";
 import mongoose from "mongoose";
+import {createAuditLog} from './audit-log.service.js'
+import { AuditAction } from "../types/audit.types.js";
 export async function getAllUsersService({page,limit,user,search,sort}:getAllUsersInput):Promise<getAllUsersResult> 
 {   
     if(user.userRole!=="admin"){
@@ -79,39 +81,67 @@ export async function getUserByIdService(
   };
 }
 
-export async function toggleBanUserService(input :toggleBanUserInput)
-:Promise<UserSummary>{ 
+export async function toggleBanUserService(
+  input: toggleBanUserInput
+): Promise<UserSummary> {
 
-    const {user,targetUserId}=input;
-      // Input validation
-      if(!targetUserId || !(targetUserId as string).match(/^[0-9a-fA-F]{24}$/)) {
-        throw new AppError("Invalid user ID", 400);
-      }
-        if(user.userId.toString() === targetUserId) {
-          throw new AppError("You cannot ban yourself", 400);
-        }
+  const { user, targetUserId } = input;
 
-        const targetUser = await User.findById(targetUserId);
-          if(!targetUser) {
-            throw new AppError("User not found", 404);
-          }
+  // validate ObjectId
+  if (!targetUserId || !mongoose.Types.ObjectId.isValid(targetUserId)) {
+    throw new AppError("Invalid user ID", 400);
+  }
 
-            // Prevent banning other admins
-            if(targetUser.role === "admin" && user.userId.toString() !== targetUserId) {
-              throw new AppError("Cannot ban another admin", 403);
-            }
-            targetUser.isBanned = !targetUser.isBanned;
-            await targetUser.save();
+  // prevent self-ban
+  if (user.userId === targetUserId) {
+    throw new AppError("You cannot ban yourself", 400);
+  }
 
-            return {
-                id: targetUser._id.toString(),
-                username: targetUser.username,
-                email: targetUser.email,
-                role: targetUser.role,
-                isBanned: targetUser.isBanned,
-                createdAt: targetUser.createdAt,
-            }
+  const targetUser = await User.findById(targetUserId);
+  if (!targetUser) {
+    throw new AppError("User not found", 404);
+  }
 
-   
+  // prevent admin → admin
+  if (targetUser.role === "admin") {
+    throw new AppError("Cannot ban another admin", 403);
+  }
 
+  // ✅ capture BEFORE
+  const previousStatus = targetUser.isBanned;
+
+  // ✅ toggle
+  targetUser.isBanned = !previousStatus;
+  await targetUser.save();
+
+  // ✅ determine action AFTER toggle
+  const action: AuditAction = targetUser.isBanned
+    ? "BAN_USER"
+    : "UNBAN_USER";
+
+  // ✅ audit log must reflect change
+  try {
+    await createAuditLog({
+      actorId: user.userId,
+      actorRole: "admin",
+      action,
+      targetType: "user",
+      targetId: targetUserId,
+      metadata: {
+        previousStatus,
+        newStatus: targetUser.isBanned,
+      },
+    });
+  } catch (err) {
+    console.error("audit failed", err);
+  }
+
+  return {
+    id: targetUser._id.toString(),
+    username: targetUser.username,
+    email: targetUser.email,
+    role: targetUser.role,
+    isBanned: targetUser.isBanned,
+    createdAt: targetUser.createdAt,
+  };
 }

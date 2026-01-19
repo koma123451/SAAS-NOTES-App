@@ -8,7 +8,7 @@ import AppError from "../utils/AppError.js";
 import bcrypt from "bcryptjs";
 import { signToken } from "../utils/jwt.js";
 import { IUser } from "../model/user.model.js";
-
+import {createAuditLog} from './audit-log.service.js'
 export async function loginUserService(
   input: LoginInput
 ): Promise<LoginResult> {
@@ -36,6 +36,21 @@ export async function loginUserService(
     role: user.role,
   });
 
+  try {
+  // audit log
+  await createAuditLog({
+  actorId: user._id.toString(),
+  actorRole: user.role,
+  action: "LOGIN",
+  targetType: "user",
+  targetId: user._id.toString(),
+});
+
+  } catch (err) {
+    console.error("audit failed", err);
+  }
+
+
   return {
     token,
     user: {
@@ -62,6 +77,22 @@ export async function registerUserService(input: RegisterInput): Promise<Registe
         id: user._id.toString(),
         role: user.role,
       });
+
+      try {
+            // audit log
+    await createAuditLog({
+      actorId: user._id.toString(),
+      actorRole: user.role,
+      action: "REGISTER",
+      targetType: "user",
+      targetId: user._id.toString(),
+    });
+    } catch (err) {
+      console.error("audit failed", err);
+    }
+
+
+
     return {
     token,
     user: {

@@ -36,3 +36,23 @@ export interface getAllNotesResult
     notes:AdminNoteSummary[];
     pagination:Pagination;   
 }
+
+
+// get notes input
+
+export interface GetUserNotesInput extends PaginationOptions {
+  user:ActorContext;
+  userId:string
+  search?: string
+  sort?: string
+}
+
+export interface GetUserNotesResult  {
+  notes:AdminNoteSummary[],
+  pagination: Pagination;
+}
+
+export interface DeleteAnyNoteInput {
+    id: string;
+    user: ActorContext;
+}

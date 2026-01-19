@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 import AdminUserNotes from './pages/AdminUserNotes.jsx'
 import AdminRoute from './components/AdminRoute.jsx'
+import AuditLog from './pages/AuditLog.jsx'
 import {useUserStore} from './store/user.js'
 import {useEffect} from 'react'
 import "../realtime/socket.js"
@@ -35,6 +36,7 @@ function App() {
         {/* Admin route group */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/auditlog" element={<AuditLog />} />
           <Route
             path="/admin/users/:userId/notes"
             element={<AdminUserNotes />}

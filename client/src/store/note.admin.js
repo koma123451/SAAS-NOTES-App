@@ -29,6 +29,7 @@ export const useAdminNoteStore=create((set,get)=>({
     try{
       set({loading:true})
       const query = new URLSearchParams(params).toString();
+      console.log("Fetching notes for user:", userId, "with params:", params)
       const {ok,data} = await apiRequest(`/admin/users/${userId}/notes?${query}`,{method:"GET"})
       if(ok){
         set({notes:data.data,

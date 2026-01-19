@@ -21,14 +21,15 @@ export interface DeleteNoteInput extends ActorContext {
   noteId: string
 }
 
-// get Notes Type
+// get AllNotes Type
 export interface GetNotesInput extends PaginationOptions {
   userId:string
   search?: string
   sort?: string
 }
-// get Notes Result Type
+// get AllNotes Result Type
 export interface GetNotesResult  {
   notes:NoteSummary[]
   pagination: Pagination;
 }
+

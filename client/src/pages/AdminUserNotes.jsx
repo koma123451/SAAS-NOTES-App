@@ -13,7 +13,7 @@ import {useAdminNoteStore} from '../store/note.admin.js'
 export default function AdminUserNotes() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const [page,setPage]= useState()
+  const [page,setPage]= useState(1)
 
   const {
     notes,
@@ -25,7 +25,7 @@ export default function AdminUserNotes() {
   useEffect(() => {
     if (userId) {
       getUserNotes(userId,
-      { page,
+      { page:page??1,
       limit:5,
       sort: "createdAt:desc"});
     }

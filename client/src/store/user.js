@@ -6,25 +6,24 @@ export const useUserStore = create((set,get)=>({
   loading:false,
   initialized: false,
 
-  fetchUser:async(force=false)=>{
-    if (get().initialized&&!force) return;
-    try{
-      set({loading:true})
-      const res = await apiRequest("/auth/me",{method:"GET"})
-      if(res.ok){
-        // Backend returns { success: true, data: user }
-        // Handle both formats: { data: user } or { data: { user: ... } }
-        const userData = res.data?.data || res.data;
-        set({user:userData})
-      }else{
-        set({user:null})
-      }
-    }catch(err){
-      set({user:null})
-    }finally{
-      set({loading:false,initialized: true})
+  fetchUser: async () => {
+  try {
+    set({ loading: true });
+
+    const res = await apiRequest("/auth/me", { method: "GET" });
+
+    if (res.ok) {
+      const userData = res.data?.data || res.data;
+      set({ user: userData });
+    } else {
+      set({ user: null });
     }
-  },
+  } catch {
+    set({ user: null });
+  } finally {
+    set({ loading: false, initialized: true });
+  }
+},
 
   login:async(email,password)=>{
     try{
