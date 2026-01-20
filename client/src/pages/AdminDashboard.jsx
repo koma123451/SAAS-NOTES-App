@@ -74,6 +74,7 @@ return (
     to="/admin"
     variant="ghost"
     justifyContent="flex-start"
+    color="gray.100"
   >
     Dashboard
   </Button>
@@ -83,6 +84,7 @@ return (
     to="/admin/users"
     variant="ghost"
     justifyContent="flex-start"
+    color="gray.100"
   >
     Users
   </Button>
@@ -92,6 +94,7 @@ return (
     to="/admin/notes"
     variant="ghost"
     justifyContent="flex-start"
+    color="gray.100"
   >
     Notes
   </Button>
@@ -101,6 +104,7 @@ return (
     to="/admin/auditlog"
     variant="ghost"
     justifyContent="flex-start"
+    color="gray.100"
   >
     Audit Logs
   </Button>

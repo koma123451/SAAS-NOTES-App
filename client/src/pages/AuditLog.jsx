@@ -65,11 +65,11 @@ export default function AuditLog() {
             <Tbody>
               {logs.map((log) => (
                 <Tr key={log._id}>
-                  <Td>
+                  <Td color="gray.200">
                     {new Date(log.createdAt).toLocaleString()}
                   </Td>
 
-                  <Td fontSize="sm">
+                  <Td fontSize="sm" color="gray.200">
                     {log.actorId}
                   </Td>
 

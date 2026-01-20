@@ -25,7 +25,7 @@ export default function Login() {
   };
 
   return (
-    <Flex height="100vh" align="center" justify="center">
+    <Flex height="100vh" align="center" justify="center" bg="gray.800">
       <Box p={8} maxWidth="400px" borderWidth={1} borderRadius="lg">
         <Heading mb={6} textAlign="center">
           Login
