@@ -66,13 +66,14 @@ export async function registerUserService(input: RegisterInput): Promise<Registe
     if(password.length < 6) {
         throw new AppError("Password must be at least 6 characters", 400);
       }
-      
+      //using email to check if the user is existed in the database
       const exists = await User.findOne({email});
       if(exists) {
         throw new AppError("Email already exists", 400);
       }
-      
+      //create new user in the database
       const user = await User.create({username,email,password});
+      //generate token and sign to the user
       const token = signToken({
         id: user._id.toString(),
         role: user.role,

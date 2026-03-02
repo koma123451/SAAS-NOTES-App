@@ -20,7 +20,7 @@ export const registerUser=asyncHandler(async (req,res)=>{
   if(!username || !email || !password) {
     throw new AppError("Username, email and password are required", 400);
   }
-  
+  // call service
   const result = await registerUserService({username,email,password});
   
   res.cookie("token",result.token,cookieOptions);
@@ -55,7 +55,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const logoutUser = asyncHandler(async(req,res)=>{
   res.clearCookie("token",cookieOptions);
-  res.json({success:true,message:"Logged out"})
+  res.status(200).json({success:true,message:"Logged out"})
 })
 
 
@@ -64,7 +64,7 @@ export const getMe = asyncHandler(async (req, res) => {
   if (!user) {
     throw new AppError("User not found", 404);
   }
-  res.json({
+  res.status(200).json({
     success: true,
     data: user,
   });

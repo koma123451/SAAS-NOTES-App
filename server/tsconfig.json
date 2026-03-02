@@ -13,7 +13,7 @@
     "skipLibCheck": true,  //跳过库文件检查。
 
     "resolveJsonModule": true,  //允许导入 JSON 文件。
-    "types": ["node"]  //这是一个 Node 项目，不是前端项目
+    "types": ["node","jest"]  //这是一个 Node 项目，不是前端项目
   },
   "include": ["**/*.ts", "../express.d.ts"],  //只检查 src 里的 TS
   "exclude": ["node_modules", "dist"]  //排除的文件。
